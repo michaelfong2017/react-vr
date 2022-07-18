@@ -1,0 +1,41 @@
+<html>
+  <head>
+    <title>BasicAppTemplate</title>
+    <style>body { margin: 0; }</style>
+    <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
+  </head>
+  <body>
+    <!-- Attachment point for your app -->
+    <h1>
+      360 Test
+    </h1>
+    <div id="container"></div>
+    <h1>
+      360 yo
+    </h1>
+    <script src="./client.bundle.js"></script>
+    <script>
+      // Initialize the React 360 application
+      React360.init(
+        'index.bundle.js',
+        document.getElementById('container'),
+        {
+          //bridgeFile: 'NonBlobBridge.js',
+          assetRoot: 'static_assets/',
+        }
+      );
+
+      const container = document.getElementById('container')
+      container.style.position = "relative"
+      container.style.width = "500px"
+      container.style.height = "500px"
+      const div = document.getElementById('container').firstElementChild
+      div.style.width = "100%"
+      div.style.height = "100%"
+      const canvas = div.firstElementChild
+      canvas.style.width = "100%"
+      canvas.style.height = "100%"
+
+    </script>
+  </body>
+</html>

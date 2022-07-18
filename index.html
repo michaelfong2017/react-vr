@@ -1,0 +1,35 @@
+<html>
+  <head>
+    <title>BasicAppTemplate</title>
+    <style>body { margin: 0; }</style>
+    <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
+  </head>
+  <body>
+    <!-- Attachment point for your app -->
+    <div id="container"></div>
+    <script src="./client.bundle?platform=vr"></script>
+    <script>
+      // Initialize the React 360 application
+      React360.init(
+        'index.bundle?platform=vr&dev=true',
+        document.getElementById('container'),
+        {
+          //bridgeFile: 'NonBlobBridge.js',
+          assetRoot: 'static_assets/',
+        }
+      );
+
+      const container = document.getElementById('container')
+      container.style.position = "relative"
+      container.style.width = "auto"
+      container.style.height = "90%"
+      const div = document.getElementById('container').firstElementChild
+      div.style.width = "100%"
+      div.style.height = "100%"
+      const canvas = div.firstElementChild
+      canvas.style.width = "auto"
+      canvas.style.height = "100%"
+
+    </script>
+  </body>
+</html>
