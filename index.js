@@ -19,8 +19,7 @@ const VIDEO_SOURCE =[
   //   fileFormat: 'webm',
   // },
   {
-    // url: 'https://api.robocore.ai/stream/stream/llhls.m3u8', 
-    url: 'http://localhost:3333/stream/stream/llhls.m3u8', 
+    url: 'https://api.robocore.ai/stream/stream/llhls.m3u8', 
     fileFormat: 'webm',
   }
 ];
