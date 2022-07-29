@@ -6,13 +6,7 @@
   </head>
   <body>
     <!-- Attachment point for your app -->
-    <h1>
-      360 Test
-    </h1>
     <div id="container"></div>
-    <h1>
-      360 yo
-    </h1>
     <script src="./client.bundle.js"></script>
     <script>
       // Initialize the React 360 application
@@ -27,13 +21,13 @@
 
       const container = document.getElementById('container')
       container.style.position = "relative"
-      container.style.width = "500px"
-      container.style.height = "500px"
+      container.style.width = "auto"
+      container.style.height = "100%"
       const div = document.getElementById('container').firstElementChild
       div.style.width = "100%"
       div.style.height = "100%"
       const canvas = div.firstElementChild
-      canvas.style.width = "100%"
+      canvas.style.width = "auto"
       canvas.style.height = "100%"
 
     </script>
