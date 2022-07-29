@@ -1,4 +1,5 @@
 import {ReactInstance, Surface} from 'react-360-web';
+import { Euler } from 'three';
 import HLSVideoPlayer from "./HLSVideoPlayer";
 import MouseZoomPanCameraController from "./MouseZoomPanCameraController";
 
@@ -63,7 +64,7 @@ function init(bundle, parent, options = {}) {
       const DEFAULT_DENSITY = 4680
       const DENSITY_SCALE = 1/2
       var d = 1 / DENSITY_SCALE * DEFAULT_DENSITY / (Math.abs(r360.getCameraPosition()[2]) / 16 / RADIUS_SCALE + 0.25) / 4
-      console.log(d)
+      // console.log(d)
       // horizontalPanel.setDensity(d, d)
       hvPanel.setDensity(d, d)
     },
@@ -85,24 +86,54 @@ function init(bundle, parent, options = {}) {
 
   r360.controls.clearCameraControllers();
 
-  function incrementCameraPosition(z: number, scale: number = 1) {
+  function zoom(deltaY: number, scale: number = 1) {
     if (
-      (r360.getCameraPosition()[2] >= 1000 && z >= 0) ||
-      (r360.getCameraPosition()[2] <= -1000 && z <= 0)
+      (r360.getCameraPosition()[0] >= 1000 || r360.getCameraPosition()[1] >= 1000 || r360.getCameraPosition()[2] >= 1000 && deltaY >= 0) ||
+      (r360.getCameraPosition()[0] <= -1000 || r360.getCameraPosition()[1] <= -1000 || r360.getCameraPosition()[2] <= -1000 && deltaY <= 0)
     ) {
       return;
     }
+
+    const cameraDirection = [0, 0, -1];
+    rotateByQuaternion(cameraDirection, r360.getCameraQuaternion());
+
     r360._cameraPosition = [
-      r360.getCameraPosition()[0],
-      r360.getCameraPosition()[1],
-      r360.getCameraPosition()[2] + z * scale,
+      r360.getCameraPosition()[0] - deltaY * cameraDirection[0] * scale,
+      r360.getCameraPosition()[1] - deltaY * cameraDirection[1] * scale,
+      r360.getCameraPosition()[2] - deltaY * cameraDirection[2] * scale,
     ];
+  }
+
+  function moveCameraPosition(deltaPitch: number, deltaYaw: number) {
+    console.log(deltaPitch, deltaYaw)
+
+    const cameraDirection = [1, 0, 0];
+    rotateByQuaternion(cameraDirection, r360.getCameraQuaternion());
+
+    const radius = Math.sqrt(r360.getCameraPosition()[0]**2 + r360.getCameraPosition()[1]**2 + r360.getCameraPosition()[2]**2)
+    
+    console.log(radius)
+    
+    const dx = -1 * deltaPitch * cameraDirection[0] * radius
+    const dy = deltaYaw * cameraDirection[1] * radius
+    const dz = -1 * deltaPitch * cameraDirection[2] * radius
+
+    console.log(dx, dy, dz)
+
+    r360._cameraPosition = [
+      r360.getCameraPosition()[0] + dx,
+      r360.getCameraPosition()[1] + dy,
+      r360.getCameraPosition()[2] + dz,
+    ];
+
+    //
   }
 
   // fov decides how sensitive the mouse pan is
   const mouseZoomPanCameraController = new MouseZoomPanCameraController(
     r360._eventLayer,
-    incrementCameraPosition,
+    zoom,
+    moveCameraPosition,
     Math.PI
   );
   r360.controls.addCameraController(mouseZoomPanCameraController);

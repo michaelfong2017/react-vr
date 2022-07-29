@@ -17,7 +17,7 @@ export default class MouseZoomPanCameraController implements CameraController {
   _lastTouchY: number;
   _verticalFov: number;
 
-  constructor(frame: HTMLElement, incrementCameraPosition: Function, fov: number = DEFAULT_FOV) {
+  constructor(frame: HTMLElement, zoom: Function, moveCameraPosition: Function, fov: number = DEFAULT_FOV) {
     this._deltaYaw = 0;
     this._deltaPitch = 0;
     this._draggingMouse = false;
@@ -29,7 +29,8 @@ export default class MouseZoomPanCameraController implements CameraController {
     this._lastTouchX = 0;
     this._lastTouchY = 0;
     this._verticalFov = fov;
-    this._incrementCameraPosition = incrementCameraPosition;
+    this._zoom = zoom;
+    this._moveCameraPosition = moveCameraPosition;
 
     (this: any)._onWheel = this._onWheel.bind(this);
     (this: any)._onMouseDown = this._onMouseDown.bind(this);
@@ -52,7 +53,7 @@ export default class MouseZoomPanCameraController implements CameraController {
     if (!this._enabled) {
       return;
     }
-    this._incrementCameraPosition(e.deltaY)
+    this._zoom(e.deltaY)
     e.preventDefault();
   }
 
@@ -80,6 +81,8 @@ export default class MouseZoomPanCameraController implements CameraController {
     this._deltaYaw += deltaY / height * this._verticalFov;
     this._deltaYaw = Math.max(-HALF_PI, Math.min(HALF_PI, this._deltaYaw));
   
+    this._moveCameraPosition(this._deltaPitch, this._deltaYaw)
+
     // Fast Mouse Pan
     // this._deltaPitch *= 5
     // this._deltaYaw *= 5
