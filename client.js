@@ -1,5 +1,5 @@
-import {ReactInstance, Surface} from 'react-360-web';
-import { Euler } from 'three';
+import { ReactInstance, Surface } from "react-360-web";
+import { Euler } from "three";
 import HLSVideoPlayer from "./HLSVideoPlayer";
 import MouseZoomPanCameraController from "./MouseZoomPanCameraController";
 
@@ -38,7 +38,6 @@ function init(bundle, parent, options = {}) {
 
   horizontalPanel.setAngle(0, -0.5);
 
-
   const r360 = new ReactInstance(bundle, parent, {
     // Add custom options here
     fullScreen: true,
@@ -57,16 +56,20 @@ function init(bundle, parent, options = {}) {
       const vertAngle = Math.asin(cy / Math.sqrt(cx * cx + cy * cy + cz * cz));
       horizontalPanel.setAngle(horizAngle, -0.5);
       hvPanel.setAngle(horizAngle, vertAngle);
-      
-      const DEFAULT_RADIUS = 4
-      const RADIUS_SCALE = 225
-      hvPanel.setRadius(DEFAULT_RADIUS * RADIUS_SCALE)
-      const DEFAULT_DENSITY = 4680
-      const DENSITY_SCALE = 1/2
-      var d = 1 / DENSITY_SCALE * DEFAULT_DENSITY / (Math.abs(r360.getCameraPosition()[2]) / 16 / RADIUS_SCALE + 0.25) / 4
-      // console.log(d)
-      // horizontalPanel.setDensity(d, d)
-      hvPanel.setDensity(d, d)
+
+      const DEFAULT_RADIUS = 4;
+      const RADIUS_SCALE = 225;
+      hvPanel.setRadius(DEFAULT_RADIUS * RADIUS_SCALE);
+      const DEFAULT_DENSITY = 4680;
+      const DENSITY_SCALE = 1 / 16;
+      const dx = r360.getCameraPosition()[0];
+      const dy = r360.getCameraPosition()[1];
+      const dz = r360.getCameraPosition()[2];
+      const distanceToCamera = 900 - Math.sqrt(dx * dx + dy * dy + dz * dz);
+      if (distanceToCamera > 0) {
+        var d = DEFAULT_DENSITY / (distanceToCamera / 900);
+        hvPanel.setDensity(d, d);
+      }
     },
     ...options,
   });
@@ -79,46 +82,90 @@ function init(bundle, parent, options = {}) {
     r360.getDefaultSurface()
   );
 
-  r360.renderToSurface(r360.createRoot('HorizontalPanel'), horizontalPanel);
-  r360.renderToSurface(r360.createRoot('HVPanel'), hvPanel);
+  r360.renderToSurface(r360.createRoot("HorizontalPanel"), horizontalPanel);
+  r360.renderToSurface(r360.createRoot("HVPanel"), hvPanel);
 
   removeEventListener("resize", r360._onResize);
 
   r360.controls.clearCameraControllers();
 
+  var zoomInLevel = 0;
   function zoom(deltaY: number, scale: number = 1) {
-    if (
-      (r360.getCameraPosition()[0] >= 1000 || r360.getCameraPosition()[1] >= 1000 || r360.getCameraPosition()[2] >= 1000 && deltaY >= 0) ||
-      (r360.getCameraPosition()[0] <= -1000 || r360.getCameraPosition()[1] <= -1000 || r360.getCameraPosition()[2] <= -1000 && deltaY <= 0)
-    ) {
+    if (zoomInLevel == 0 && deltaY > 0) {
       return;
     }
 
     const cameraDirection = [0, 0, -1];
     rotateByQuaternion(cameraDirection, r360.getCameraQuaternion());
+    const newX =
+      r360.getCameraPosition()[0] - deltaY * cameraDirection[0] * scale;
+    const newY =
+      r360.getCameraPosition()[1] - deltaY * cameraDirection[1] * scale;
+    const newZ =
+      r360.getCameraPosition()[2] - deltaY * cameraDirection[2] * scale;
+    const newDistance = Math.sqrt(newX ** 2 + newY ** 2 + newZ ** 2);
 
-    r360._cameraPosition = [
-      r360.getCameraPosition()[0] - deltaY * cameraDirection[0] * scale,
-      r360.getCameraPosition()[1] - deltaY * cameraDirection[1] * scale,
-      r360.getCameraPosition()[2] - deltaY * cameraDirection[2] * scale,
-    ];
+    // console.log(newDistance);
+    if (newDistance <= 5) {
+      zoomInLevel = 0;
+      r360._cameraPosition = [0, 0, 0];
+      return;
+    }
+    if (newDistance >= 850 && deltaY < 0) {
+      return;
+    }
+
+    zoomInLevel -= Math.sign(deltaY) * scale;
+    // console.log(zoomInLevel);
+
+    if (zoomInLevel == 0) {
+      r360._cameraPosition = [0, 0, 0];
+    } else {
+      r360._cameraPosition = [newX, newY, newZ];
+    }
   }
 
+  var previousCameraPosition = [0, 0, -1];
   function moveCameraPosition(deltaPitch: number, deltaYaw: number) {
-    console.log(deltaPitch, deltaYaw)
+    // console.log(deltaPitch, deltaYaw);
 
-    const cameraDirection = [1, 0, 0];
-    rotateByQuaternion(cameraDirection, r360.getCameraQuaternion());
+    const rotated = [0, 0, -1];
+    rotateByQuaternion(rotated, r360.getCameraQuaternion());
+    const cameraDirection = [0, 0, 0];
+    cameraDirection[0] = rotated[0];
+    cameraDirection[1] = rotated[1];
+    cameraDirection[2] = rotated[2];
 
-    const radius = Math.sqrt(r360.getCameraPosition()[0]**2 + r360.getCameraPosition()[1]**2 + r360.getCameraPosition()[2]**2)
-    
-    console.log(radius)
-    
-    const dx = -1 * deltaPitch * cameraDirection[0] * radius
-    const dy = deltaYaw * cameraDirection[1] * radius
-    const dz = -1 * deltaPitch * cameraDirection[2] * radius
+    // console.log(previousCameraPosition);
 
-    console.log(dx, dy, dz)
+    cameraDirection[0] -= previousCameraPosition[0];
+    cameraDirection[1] -= previousCameraPosition[1];
+    cameraDirection[2] -= previousCameraPosition[2];
+
+    previousCameraPosition[0] = rotated[0];
+    previousCameraPosition[1] = rotated[1];
+    previousCameraPosition[2] = rotated[2];
+
+    // console.log(rotated);
+
+    const length = Math.sqrt(
+      cameraDirection[0] ** 2 +
+        cameraDirection[1] ** 2 +
+        cameraDirection[2] ** 2
+    );
+
+    const radius = Math.sqrt(
+      r360.getCameraPosition()[0] ** 2 +
+        r360.getCameraPosition()[1] ** 2 +
+        r360.getCameraPosition()[2] ** 2
+    );
+    // console.log(radius);
+
+    const dx = cameraDirection[0] * radius;
+    const dy = cameraDirection[1] * radius;
+    const dz = cameraDirection[2] * radius;
+
+    // console.log(dx, dy, dz);
 
     r360._cameraPosition = [
       r360.getCameraPosition()[0] + dx,
