@@ -127,12 +127,12 @@ function init(bundle, parent, options = {}) {
 
   function moveCameraPosition(deltaPitch, deltaYaw) {
     const rotated = [0, 0, -1];
+    rotateByQuaternion(rotated, r360.getCameraQuaternion());
 
     const q = new Quaternion();
     e = new Euler(deltaPitch, deltaYaw, 0, "XYZ");
     q.setFromEuler(e);
 
-    rotateByQuaternion(rotated, r360.getCameraQuaternion());
     rotateByQuaternion(rotated, q.toArray());
 
     const radius = Math.sqrt(

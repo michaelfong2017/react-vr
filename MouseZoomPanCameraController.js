@@ -1,5 +1,5 @@
 import { type Quaternion, type Vec3 } from "react-360-web/js/Controls/Types";
-import {type CameraController} from 'react-360-web/js/Controls/CameraControllers/Types';
+import { type CameraController } from "react-360-web/js/Controls/CameraControllers/Types";
 
 const DEFAULT_FOV = Math.PI / 6;
 const HALF_PI = Math.PI / 2;
@@ -17,7 +17,12 @@ export default class MouseZoomPanCameraController implements CameraController {
   _lastTouchY: number;
   _verticalFov: number;
 
-  constructor(frame: HTMLElement, zoom: Function, moveCameraPosition: Function, fov: number = DEFAULT_FOV) {
+  constructor(
+    frame: HTMLElement,
+    zoom: Function,
+    moveCameraPosition: Function,
+    fov: number = DEFAULT_FOV
+  ) {
     this._deltaYaw = 0;
     this._deltaPitch = 0;
     this._draggingMouse = false;
@@ -39,21 +44,21 @@ export default class MouseZoomPanCameraController implements CameraController {
     (this: any)._onTouchStart = this._onTouchStart.bind(this);
     (this: any)._onTouchMove = this._onTouchMove.bind(this);
     (this: any)._onTouchEnd = this._onTouchEnd.bind(this);
-    this._frame.addEventListener('wheel', this._onWheel);
-    this._frame.addEventListener('mousedown', this._onMouseDown);
-    document.addEventListener('mousemove', this._onMouseMove);
-    document.addEventListener('mouseup', this._onMouseUp);
-    this._frame.addEventListener('touchstart', this._onTouchStart);
-    this._frame.addEventListener('touchmove', this._onTouchMove);
-    this._frame.addEventListener('touchcancel', this._onTouchEnd);
-    this._frame.addEventListener('touchend', this._onTouchEnd);
+    this._frame.addEventListener("wheel", this._onWheel);
+    this._frame.addEventListener("mousedown", this._onMouseDown);
+    document.addEventListener("mousemove", this._onMouseMove);
+    document.addEventListener("mouseup", this._onMouseUp);
+    this._frame.addEventListener("touchstart", this._onTouchStart);
+    this._frame.addEventListener("touchmove", this._onTouchMove);
+    this._frame.addEventListener("touchcancel", this._onTouchEnd);
+    this._frame.addEventListener("touchend", this._onTouchEnd);
   }
 
   _onWheel(e: WheelEvent) {
     if (!this._enabled) {
       return;
     }
-    this._zoom(e.deltaY)
+    this._zoom(e.deltaY);
     e.preventDefault();
   }
 
@@ -81,15 +86,21 @@ export default class MouseZoomPanCameraController implements CameraController {
     var deltaPitch = this._deltaPitch;
     var deltaYaw = this._deltaYaw;
 
-    deltaPitch += deltaX / width * this._verticalFov * aspect;
-    deltaYaw += deltaY / height * this._verticalFov;
+    deltaPitch += (deltaX / width) * this._verticalFov * aspect;
+    deltaYaw += (deltaY / height) * this._verticalFov;
     deltaYaw = Math.max(-HALF_PI, Math.min(HALF_PI, deltaYaw));
-  
-    this._moveCameraPosition(deltaPitch, deltaYaw);
 
-    this._deltaPitch = deltaPitch;
-    this._deltaYaw = deltaYaw;
-}
+    const deltaDeltaPitch = deltaPitch - this._deltaPitch;
+    const deltaDeltaYaw = deltaYaw - this._deltaYaw;
+
+    const N = 20;
+    for (let i = 0; i < N; i++) {
+      this._moveCameraPosition(deltaPitch / N, deltaYaw / N);
+
+      this._deltaPitch += deltaDeltaPitch / N;
+      this._deltaYaw += deltaDeltaYaw / N;
+    }
+  }
 
   _onMouseUp() {
     this._draggingMouse = false;
@@ -121,10 +132,10 @@ export default class MouseZoomPanCameraController implements CameraController {
     var deltaPitch = this._deltaPitch;
     var deltaYaw = this._deltaYaw;
 
-    deltaPitch += deltaX / width * this._verticalFov * aspect;
-    deltaYaw += deltaY / height * this._verticalFov;
+    deltaPitch += (deltaX / width) * this._verticalFov * aspect;
+    deltaYaw += (deltaY / height) * this._verticalFov;
     deltaYaw = Math.max(-HALF_PI, Math.min(HALF_PI, deltaYaw));
-  
+
     this._moveCameraPosition(deltaPitch, deltaYaw);
 
     this._deltaPitch = deltaPitch;
