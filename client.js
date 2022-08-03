@@ -125,55 +125,21 @@ function init(bundle, parent, options = {}) {
     }
   }
 
-  var previousCameraPosition = [0, 0, -1];
-  function moveCameraPosition(deltaPitch: number, deltaYaw: number) {
-    // console.log(deltaPitch, deltaYaw);
-
+  function moveCameraPosition() {
     const rotated = [0, 0, -1];
     rotateByQuaternion(rotated, r360.getCameraQuaternion());
-    const cameraDirection = [0, 0, 0];
-    cameraDirection[0] = rotated[0];
-    cameraDirection[1] = rotated[1];
-    cameraDirection[2] = rotated[2];
-
-    // console.log(previousCameraPosition);
-
-    cameraDirection[0] -= previousCameraPosition[0];
-    cameraDirection[1] -= previousCameraPosition[1];
-    cameraDirection[2] -= previousCameraPosition[2];
-
-    previousCameraPosition[0] = rotated[0];
-    previousCameraPosition[1] = rotated[1];
-    previousCameraPosition[2] = rotated[2];
-
-    // console.log(rotated);
-
-    const length = Math.sqrt(
-      cameraDirection[0] ** 2 +
-        cameraDirection[1] ** 2 +
-        cameraDirection[2] ** 2
-    );
-
+    
     const radius = Math.sqrt(
       r360.getCameraPosition()[0] ** 2 +
         r360.getCameraPosition()[1] ** 2 +
         r360.getCameraPosition()[2] ** 2
     );
-    // console.log(radius);
-
-    const dx = cameraDirection[0] * radius;
-    const dy = cameraDirection[1] * radius;
-    const dz = cameraDirection[2] * radius;
-
-    // console.log(dx, dy, dz);
-
+    
     r360._cameraPosition = [
-      r360.getCameraPosition()[0] + dx,
-      r360.getCameraPosition()[1] + dy,
-      r360.getCameraPosition()[2] + dz,
+      rotated[0] * radius,
+      rotated[1] * radius,
+      rotated[2] * radius,
     ];
-
-    //
   }
 
   // fov decides how sensitive the mouse pan is

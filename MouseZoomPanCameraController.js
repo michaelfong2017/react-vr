@@ -81,11 +81,7 @@ export default class MouseZoomPanCameraController implements CameraController {
     this._deltaYaw += deltaY / height * this._verticalFov;
     this._deltaYaw = Math.max(-HALF_PI, Math.min(HALF_PI, this._deltaYaw));
   
-    this._moveCameraPosition(this._deltaPitch, this._deltaYaw)
-
-    // Fast Mouse Pan
-    // this._deltaPitch *= 5
-    // this._deltaYaw *= 5
+    this._moveCameraPosition();
 }
 
   _onMouseUp() {
@@ -117,6 +113,8 @@ export default class MouseZoomPanCameraController implements CameraController {
     this._deltaPitch += deltaX / width * this._verticalFov * aspect;
     this._deltaYaw += deltaY / height * this._verticalFov;
     this._deltaYaw = Math.max(-HALF_PI, Math.min(HALF_PI, this._deltaYaw));
+
+    this._moveCameraPosition();
   }
 
   _onTouchEnd(e: TouchEvent) {
