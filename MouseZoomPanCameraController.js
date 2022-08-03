@@ -77,11 +77,18 @@ export default class MouseZoomPanCameraController implements CameraController {
     const deltaY = e.clientY - this._lastMouseY;
     this._lastMouseX = e.clientX;
     this._lastMouseY = e.clientY;
-    this._deltaPitch += deltaX / width * this._verticalFov * aspect;
-    this._deltaYaw += deltaY / height * this._verticalFov;
-    this._deltaYaw = Math.max(-HALF_PI, Math.min(HALF_PI, this._deltaYaw));
+
+    var deltaPitch = this._deltaPitch;
+    var deltaYaw = this._deltaYaw;
+
+    deltaPitch += deltaX / width * this._verticalFov * aspect;
+    deltaYaw += deltaY / height * this._verticalFov;
+    deltaYaw = Math.max(-HALF_PI, Math.min(HALF_PI, deltaYaw));
   
-    this._moveCameraPosition();
+    this._moveCameraPosition(deltaPitch, deltaYaw);
+
+    this._deltaPitch = deltaPitch;
+    this._deltaYaw = deltaYaw;
 }
 
   _onMouseUp() {
@@ -110,11 +117,18 @@ export default class MouseZoomPanCameraController implements CameraController {
     const deltaY = y - this._lastTouchY;
     this._lastTouchX = x;
     this._lastTouchY = y;
-    this._deltaPitch += deltaX / width * this._verticalFov * aspect;
-    this._deltaYaw += deltaY / height * this._verticalFov;
-    this._deltaYaw = Math.max(-HALF_PI, Math.min(HALF_PI, this._deltaYaw));
 
-    this._moveCameraPosition();
+    var deltaPitch = this._deltaPitch;
+    var deltaYaw = this._deltaYaw;
+
+    deltaPitch += deltaX / width * this._verticalFov * aspect;
+    deltaYaw += deltaY / height * this._verticalFov;
+    deltaYaw = Math.max(-HALF_PI, Math.min(HALF_PI, deltaYaw));
+  
+    this._moveCameraPosition(deltaPitch, deltaYaw);
+
+    this._deltaPitch = deltaPitch;
+    this._deltaYaw = deltaYaw;
   }
 
   _onTouchEnd(e: TouchEvent) {

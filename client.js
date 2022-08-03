@@ -1,5 +1,5 @@
 import { ReactInstance, Surface } from "react-360-web";
-import { Euler } from "three";
+import { Euler, Quaternion } from "three";
 import HLSVideoPlayer from "./HLSVideoPlayer";
 import MouseZoomPanCameraController from "./MouseZoomPanCameraController";
 
@@ -125,16 +125,22 @@ function init(bundle, parent, options = {}) {
     }
   }
 
-  function moveCameraPosition() {
+  function moveCameraPosition(deltaPitch, deltaYaw) {
     const rotated = [0, 0, -1];
+
+    const q = new Quaternion();
+    e = new Euler(deltaPitch, deltaYaw, 0, "XYZ");
+    q.setFromEuler(e);
+
     rotateByQuaternion(rotated, r360.getCameraQuaternion());
-    
+    rotateByQuaternion(rotated, q.toArray());
+
     const radius = Math.sqrt(
       r360.getCameraPosition()[0] ** 2 +
         r360.getCameraPosition()[1] ** 2 +
         r360.getCameraPosition()[2] ** 2
     );
-    
+
     r360._cameraPosition = [
       rotated[0] * radius,
       rotated[1] * radius,
