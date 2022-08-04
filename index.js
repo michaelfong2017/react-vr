@@ -6,6 +6,8 @@ import {
   asset,
   Text,
   VrButton,
+  VideoControl,
+  MediaPlayerState,
 } from "react-360";
 import VideoModule from "VideoModule";
 import * as Environment from "Environment";
@@ -26,11 +28,13 @@ const VIDEO_SOURCE = [
   },
 ];
 
+const mediaplayerstate = new MediaPlayerState({
+  autoPlay: true,
+});
+
 class react_vr extends React.Component {
   componentDidMount() {
-    window.player360 = VideoModule.createPlayer(VIDEO_PLAYER);
-    console.log("yoooooooooooooooooooooooooooooooooooooooooo\n\n\n");
-    console.log(window.player360);
+    VideoModule.createPlayer(VIDEO_PLAYER);
     VideoModule.play(VIDEO_PLAYER, {
       source: VIDEO_SOURCE,
       stereo: "2D",
@@ -45,8 +49,10 @@ class react_vr extends React.Component {
 }
 
 const _pressed = () => {
-  console.log(window.player360);
-  window.player360.pause();
+  console.log(VideoModule.getPlayer(VIDEO_PLAYER));
+  const player = VideoModule.getPlayer(VIDEO_PLAYER);
+
+  player.seek(0);
 };
 
 const HorizontalPanel = () => (
@@ -57,15 +63,18 @@ const HorizontalPanel = () => (
   </View>
 );
 
-const HVPanel = () => (
-  <View style={styles.panel}>
-    <VrButton onClick={_pressed} style={styles.greetingBox}>
-      <Text style={styles.panelText}>
-        {"Follows Horizontally\nand Vertically"}
-      </Text>
-    </VrButton>
-  </View>
-);
+const HVPanel = () => {
+  return (
+    <View style={styles.panel}>
+      <VrButton onClick={_pressed} style={styles.greetingBox}>
+        <Text style={styles.panelText}>
+          {"Follows Horizontally\nand Vertically"}
+        </Text>
+        <VideoControl playerState={mediaplayerstate} />
+      </VrButton>
+    </View>
+  );
+};
 
 const styles = StyleSheet.create({
   panel: {
