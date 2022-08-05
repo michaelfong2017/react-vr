@@ -34,7 +34,7 @@ function rotateByQuaternion(v: Vec3, q: Quaternion) {
 
 function init(bundle, parent, options = {}) {
   const horizontalPanel = new Surface(300, 300, Surface.SurfaceShape.Flat);
-  const hvPanel = new Surface(900, 300, Surface.SurfaceShape.Flat);
+  const hvPanel = new Surface(450, 50, Surface.SurfaceShape.Flat);
 
   horizontalPanel.setAngle(0, -0.5);
 
@@ -58,7 +58,7 @@ function init(bundle, parent, options = {}) {
       hvPanel.setAngle(horizAngle, vertAngle);
 
       const DEFAULT_RADIUS = 4;
-      const RADIUS_SCALE = 200;
+      const RADIUS_SCALE = 225;
       hvPanel.setRadius(DEFAULT_RADIUS * RADIUS_SCALE);
       const DEFAULT_DENSITY = 4680;
       const DENSITY_SCALE = 1 / 16;

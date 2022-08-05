@@ -28,10 +28,10 @@ const VIDEO_SOURCE = [
   },
 ];
 
-const mediaplayerstate = new MediaPlayerState({
+const mediaPlayerState = new MediaPlayerState({
   autoPlay: true,
 });
-mediaplayerstate.playStatus = "playing"
+mediaPlayerState.playStatus = "playing"
 
 class react_vr extends React.Component {
   componentDidMount() {
@@ -42,12 +42,14 @@ class react_vr extends React.Component {
       // console.log("isBuffering: " + event.isBuffering);
       // console.log("position: " + event.position);
 
-      console.log(mediaplayerstate);
+      // console.log(mediaPlayerState);
 
-      mediaplayerstate.duration = event.duration;
-      mediaplayerstate.emit('durationChange', event.duration);
-      mediaplayerstate.currentTime = event.position;
-      mediaplayerstate.emit('timeUpdate', event.position);
+      /** Update CustomVideoControl UI (slide bar) */
+      mediaPlayerState.duration = event.duration;
+      mediaPlayerState.emit('durationChange', event.duration);
+      mediaPlayerState.currentTime = event.position;
+      mediaPlayerState.emit('timeUpdate', event.position);
+      /** Update CustomVideoControl UI (slide bar) END */
     });
 
     VideoModule.play(VIDEO_PLAYER, {
@@ -67,8 +69,6 @@ const _pressed = () => {
   console.log(VideoModule.getPlayer(VIDEO_PLAYER));
   const player = VideoModule.getPlayer(VIDEO_PLAYER);
 
-  mediaplayerstate.play();
-
   player.seek(10);
 };
 
@@ -83,15 +83,16 @@ const HorizontalPanel = () => (
 const HVPanel = () => {
   return (
     <View style={styles.panel}>
-      <CustomVideoControl playerState={mediaplayerstate} />
+      <CustomVideoControl playerState={mediaPlayerState} />
     </View>
   );
 };
 
 const styles = StyleSheet.create({
   panel: {
-    width: 900,
-    height: 300,
+    width: 450,
+    height: 50,
+    bottom: 0,
     backgroundColor: "rgba(255, 255, 255, 0.8)",
     justifyContent: "center",
     alignItems: "center",

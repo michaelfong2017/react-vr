@@ -6,8 +6,10 @@
  * LICENSE file in the root directory of this source tree. An additional grant
  * of patent rights can be found in the PATENTS file in the same directory.
  *
- * @providesModule VideoControl
+ * @providesModule CustomVideoControl
  */
+ import VideoModule from "VideoModule";
+ const VIDEO_PLAYER = "hls_video";
 
  const PropTypes = require('prop-types');
  const React = require('React');
@@ -225,10 +227,22 @@
    _onPlayButtonClick() {
     console.log("_onPlayButtonClick");
      if (!this._registeredUserGesture) {
+        // Original
+    //    if (this.state.playStatus === 'playing') {
+    //      this.props.playerState.pause();
+    //    } else {
+    //      this.props.playerState.play();
+    //    }
+       // Original END
+
        if (this.state.playStatus === 'playing') {
-         this.props.playerState.pause();
+         const player = VideoModule.getPlayer(VIDEO_PLAYER);
+         player.pause(); // For effect
+         this.setState({playStatus: "paused"}); // For CustomVideoControl UI
        } else {
-         this.props.playerState.play();
+         const player = VideoModule.getPlayer(VIDEO_PLAYER);
+         player.resume(); // For effect
+         this.setState({playStatus: "playing"}); // For CustomVideoControl UI
        }
      }
    },
@@ -273,14 +287,20 @@
    },
  
    _onClickProgress(progress) {
-    console.log(progress);
-     this.props.playerState.seekTo(this.state.duration * progress);
+    // Original
+    //  this.props.playerState.seekTo(this.state.duration * progress);
+    // Original END
+
+     console.log(progress);
+
+     const player = VideoModule.getPlayer(VIDEO_PLAYER);
+     player.seek(this.state.duration * progress);
  
      // If media is not playing, we will not be getting progress updates, so let's
      // manually update the progress bar to reflect the most recent progress click.
-     if (this.state.playStatus !== 'playing') {
-       this.setState({currentTime: this.state.duration * progress});
-     }
+    //  if (this.state.playStatus !== 'playing') {
+     this.setState({currentTime: this.state.duration * progress});
+    //  }
    },
  
    render: function() {
