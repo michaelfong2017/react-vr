@@ -6,11 +6,11 @@ import {
   asset,
   Text,
   VrButton,
-  VideoControl,
   MediaPlayerState,
 } from "react-360";
 import VideoModule from "VideoModule";
 import * as Environment from "Environment";
+import CustomVideoControl from "./CustomVideoControl";
 
 const VIDEO_PLAYER = "hls_video";
 const VIDEO_SOURCE = [
@@ -31,10 +31,25 @@ const VIDEO_SOURCE = [
 const mediaplayerstate = new MediaPlayerState({
   autoPlay: true,
 });
+mediaplayerstate.playStatus = "playing"
 
 class react_vr extends React.Component {
   componentDidMount() {
-    VideoModule.createPlayer(VIDEO_PLAYER);
+    const player = VideoModule.createPlayer(VIDEO_PLAYER);
+
+    player.addListener("onVideoStatusChanged", (event: VideoStatusEvent) => {
+      // console.log("duration: " + event.duration);
+      // console.log("isBuffering: " + event.isBuffering);
+      // console.log("position: " + event.position);
+
+      console.log(mediaplayerstate);
+
+      mediaplayerstate.duration = event.duration;
+      mediaplayerstate.emit('durationChange', event.duration);
+      mediaplayerstate.currentTime = event.position;
+      mediaplayerstate.emit('timeUpdate', event.position);
+    });
+
     VideoModule.play(VIDEO_PLAYER, {
       source: VIDEO_SOURCE,
       stereo: "2D",
@@ -52,7 +67,9 @@ const _pressed = () => {
   console.log(VideoModule.getPlayer(VIDEO_PLAYER));
   const player = VideoModule.getPlayer(VIDEO_PLAYER);
 
-  player.seek(0);
+  mediaplayerstate.play();
+
+  player.seek(10);
 };
 
 const HorizontalPanel = () => (
@@ -66,19 +83,14 @@ const HorizontalPanel = () => (
 const HVPanel = () => {
   return (
     <View style={styles.panel}>
-      <VrButton onClick={_pressed} style={styles.greetingBox}>
-        <Text style={styles.panelText}>
-          {"Follows Horizontally\nand Vertically"}
-        </Text>
-        <VideoControl playerState={mediaplayerstate} />
-      </VrButton>
+      <CustomVideoControl playerState={mediaplayerstate} />
     </View>
   );
 };
 
 const styles = StyleSheet.create({
   panel: {
-    width: 300,
+    width: 900,
     height: 300,
     backgroundColor: "rgba(255, 255, 255, 0.8)",
     justifyContent: "center",
