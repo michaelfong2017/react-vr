@@ -33,10 +33,7 @@ function rotateByQuaternion(v: Vec3, q: Quaternion) {
 }
 
 function init(bundle, parent, options = {}) {
-  const horizontalPanel = new Surface(300, 300, Surface.SurfaceShape.Flat);
   const hvPanel = new Surface(450, 50, Surface.SurfaceShape.Flat);
-
-  horizontalPanel.setAngle(0, -0.5);
 
   const r360 = new ReactInstance(bundle, parent, {
     // Add custom options here
@@ -54,7 +51,6 @@ function init(bundle, parent, options = {}) {
       const cz = cameraDirection[2];
       const horizAngle = Math.atan2(cx, -cz);
       const vertAngle = Math.asin(cy / Math.sqrt(cx * cx + cy * cy + cz * cz));
-      horizontalPanel.setAngle(horizAngle, -0.5);
       hvPanel.setAngle(horizAngle, vertAngle);
 
       const DEFAULT_RADIUS = 4;
@@ -82,7 +78,6 @@ function init(bundle, parent, options = {}) {
     r360.getDefaultSurface()
   );
 
-  r360.renderToSurface(r360.createRoot("HorizontalPanel"), horizontalPanel);
   r360.renderToSurface(r360.createRoot("HVPanel"), hvPanel);
 
   removeEventListener("resize", r360._onResize);

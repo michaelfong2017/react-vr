@@ -65,21 +65,6 @@ class react_vr extends React.Component {
   }
 }
 
-const _pressed = () => {
-  console.log(VideoModule.getPlayer(VIDEO_PLAYER));
-  const player = VideoModule.getPlayer(VIDEO_PLAYER);
-
-  player.seek(10);
-};
-
-const HorizontalPanel = () => (
-  <View style={styles.panel}>
-    <VrButton onClick={_pressed} style={styles.greetingBox}>
-      <Text style={styles.panelText}>{"Follows Horizontally"}</Text>
-    </VrButton>
-  </View>
-);
-
 const HVPanel = () => {
   return (
     <View style={styles.panel}>
@@ -105,5 +90,4 @@ const styles = StyleSheet.create({
 });
 
 AppRegistry.registerComponent("react_vr", () => react_vr);
-AppRegistry.registerComponent("HorizontalPanel", () => HorizontalPanel);
 AppRegistry.registerComponent("HVPanel", () => HVPanel);
