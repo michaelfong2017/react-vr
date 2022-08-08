@@ -47,7 +47,7 @@ class react_vr extends React.Component {
       /** Update CustomVideoControl UI (slide bar) */
       mediaPlayerState.duration = event.duration;
       mediaPlayerState.emit('durationChange', event.duration);
-      mediaPlayerState.currentTime = event.position;
+      mediaPlayerState.currentTime = -1;
       mediaPlayerState.emit('timeUpdate', event.position);
       /** Update CustomVideoControl UI (slide bar) END */
     });
